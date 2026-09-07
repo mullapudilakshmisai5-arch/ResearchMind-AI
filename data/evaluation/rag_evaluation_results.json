@@ -1,0 +1,53 @@
+{
+    "project": "ResearchMind-AI",
+    "paper": "AI_RAG_paper.pdf",
+    "total_questions": 5,
+    "generated_at": "2026-09-06 16:01:41",
+    "results": [
+        {
+            "question": "What is Retrieval Augmented Generation?",
+            "answer": "RAG techniques may work well in these settings, and could represent promising future work.",
+            "retrieved_chunks": [
+                43,
+                33,
+                85
+            ]
+        },
+        {
+            "question": "What are the main components of RAG?",
+            "answer": "retrieval recall perfor- mance in NQ",
+            "retrieved_chunks": [
+                44,
+                38,
+                76
+            ]
+        },
+        {
+            "question": "Why is retrieval important in RAG systems?",
+            "answer": "improves performance across a variety of NLP tasks when considered in isolation",
+            "retrieved_chunks": [
+                38,
+                44,
+                37
+            ]
+        },
+        {
+            "question": "What are the advantages of using RAG?",
+            "answer": "RAG could be employed in a wide variety of scenarios with direct benefit to society, for example by endowing it with a medical index and asking it open-domain questions on that topic, or by helping people be more effective at their jobs. With these advantages also come potential downs t RAG generations are more diverse than BART generations (see 4.5).",
+            "retrieved_chunks": [
+                44,
+                27,
+                38
+            ]
+        },
+        {
+            "question": "What challenges are associated with RAG?",
+            "answer": "RAG generations are more diverse than BART generations",
+            "retrieved_chunks": [
+                44,
+                27,
+                38
+            ]
+        }
+    ]
+}
