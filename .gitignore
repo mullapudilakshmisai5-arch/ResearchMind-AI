@@ -36,13 +36,3 @@ Thumbs.db
 
 # Logs
 *.log
-# Python cache
-*.pyc
-# Environment / secrets
-# Research paper and generated data
-data/vector_db/*
-data/evaluation/*
-# Keep folder structure
-!data/papers/.gitkeep
-!data/vector_db/.gitkeep
-!data/evaluation/.gitkeep
