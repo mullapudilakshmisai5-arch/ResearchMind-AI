@@ -1,228 +1,235 @@
+"""
+ResearchMind-AI
+Phase 9: Research Intelligence
 
-import json
-import os
-
-
-def analyze_query(question):
-    question_lower = question.lower().strip()
-
-    if any(word in question_lower for word in [
-        "what is", "define", "definition", "meaning"
-    ]):
-        query_type = "definition"
-
-    elif any(word in question_lower for word in [
-        "how does", "how do", "explain", "working", "works"
-    ]):
-        query_type = "explanation"
-
-    elif any(word in question_lower for word in [
-        "benefit", "advantages", "advantage",
-        "useful", "importance"
-    ]):
-        query_type = "benefits"
-
-    elif any(word in question_lower for word in [
-        "difference", "compare", "comparison",
-        "versus", "vs"
-    ]):
-        query_type = "comparison"
-
-    elif any(word in question_lower for word in [
-        "limitation", "limitations",
-        "disadvantage", "disadvantages", "problem"
-    ]):
-        query_type = "limitations"
-
-    else:
-        query_type = "general"
-
-    return {
-        "question": question,
-        "query_type": query_type,
-        "keywords": question_lower.split()
-    }
-
-
-def expand_query(question):
-    question_lower = question.lower().strip()
-
-    expanded_terms = [question]
-
-    if "retrieval" in question_lower or "rag" in question_lower:
-        expanded_terms.extend([
-            "retrieval augmented generation",
-            "retrieval augmented generation RAG",
-            "retrieval based language generation",
-            "retrieving external knowledge for generation"
-        ])
-
-    if (
-        "transformer" in question_lower
-        or "language model" in question_lower
-        or "llm" in question_lower
-    ):
-        expanded_terms.extend([
-            "transformer language model",
-            "large language model",
-            "neural language model"
-        ])
-
-    return list(dict.fromkeys(expanded_terms))
-
-
-def advanced_retrieval(
-    question,
-    embedding_model,
-    index,
-    chunks,
-    top_k=5
-):
-    queries = expand_query(question)
-
-    all_results = []
-
-    for query in queries:
-
-        query_embedding = embedding_model.encode(
-            [query],
-            convert_to_numpy=True
-        )
-
-        distances, indices = index.search(
-            query_embedding,
-            top_k
-        )
-
-        for rank, idx in enumerate(indices[0]):
-
-            if idx < 0 or idx >= len(chunks):
-                continue
-
-            all_results.append({
-                "chunk_id": int(idx),
-                "text": str(chunks[idx]),
-                "score": float(distances[0][rank])
-            })
-
-    unique_results = {}
-
-    for result in all_results:
-
-        chunk_id = result["chunk_id"]
-
-        if chunk_id not in unique_results:
-            unique_results[chunk_id] = result
-
-    results = list(unique_results.values())
-
-    return results[:top_k]
-
-
-def advanced_rag_with_citations(
-    question,
-    embedding_model,
-    index,
-    chunks,
-    citation_metadata,
-    tokenizer,
-    model,
-    top_k=5
-):
-
-    results = advanced_retrieval(
-        question,
-        embedding_model,
-        index,
-        chunks,
-        top_k
-    )
-
-    cited_results = []
-
-    for result in results:
-
-        chunk_id = result["chunk_id"]
-
-        citation_info = citation_metadata.get(
-            chunk_id,
-            {}
-        )
-
-        cited_results.append({
-            "chunk_id": chunk_id,
-            "text": result["text"],
-            "score": result["score"],
-            "source": citation_info.get(
-                "source",
-                "Unknown"
-            ),
-            "page": citation_info.get(
-                "page",
-                "Unknown"
-            )
-        })
-
-    context = "\n\n".join(
-        result["text"]
-        for result in cited_results
-    )
-
-    query_info = analyze_query(question)
-
-    query_type = query_info["query_type"]
-
-    prompt = f"""
-You are an AI research assistant.
-
-Question type:
-{query_type}
-
-Use only the research context provided below.
-
-Research Context:
-{context}
-
-Question:
-{question}
-
-Give a clear and accurate answer.
-Do not invent information.
-
-Answer:
+Provides query analysis, query expansion,
+advanced retrieval, and research-oriented
+answer generation.
 """
 
-    inputs = tokenizer(
-        prompt,
-        return_tensors="pt",
-        truncation=True,
-        max_length=2048
-    )
+import re
+from typing import List, Dict, Any
 
-    outputs = model.generate(
-        **inputs,
-        max_new_tokens=250
-    )
 
-    answer = tokenizer.decode(
-        outputs[0],
-        skip_special_tokens=True
-    )
+def analyze_query(query: str) -> Dict[str, Any]:
+    """
+    Analyze a research query and identify
+    important keywords and query characteristics.
+    """
 
-    citations = []
+    if not isinstance(query, str):
+        raise TypeError("Query must be a string.")
 
-    for result in cited_results:
+    query = query.strip()
 
-        citations.append({
-            "chunk_id": result["chunk_id"],
-            "source": result["source"],
-            "page": result["page"],
-            "score": result["score"]
-        })
+    if not query:
+        return {
+            "query": "",
+            "keywords": [],
+            "word_count": 0,
+            "question_type": "unknown"
+        }
+
+    words = re.findall(r"\b[a-zA-Z0-9]+\b", query)
+
+    stop_words = {
+        "the", "is", "are", "was", "were",
+        "a", "an", "and", "or", "of", "to",
+        "in", "on", "for", "with", "what",
+        "how", "why", "when", "where", "which"
+    }
+
+    keywords = [
+        word.lower()
+        for word in words
+        if word.lower() not in stop_words
+    ]
+
+    lower_query = query.lower()
+
+    if lower_query.startswith(("what", "define", "explain")):
+        question_type = "definition"
+    elif lower_query.startswith(("how", "describe")):
+        question_type = "explanation"
+    elif lower_query.startswith(("why", "reason")):
+        question_type = "reasoning"
+    elif lower_query.startswith(("compare", "difference", "differentiate")):
+        question_type = "comparison"
+    else:
+        question_type = "general"
 
     return {
-        "question": question,
-        "query_type": query_type,
-        "answer": answer,
-        "citations": citations
+        "query": query,
+        "keywords": list(dict.fromkeys(keywords)),
+        "word_count": len(words),
+        "question_type": question_type
     }
+
+
+def expand_query(query: str) -> List[str]:
+    """
+    Generate simple research-oriented query variations.
+    """
+
+    analysis = analyze_query(query)
+
+    original = analysis["query"]
+    keywords = analysis["keywords"]
+
+    queries = [original]
+
+    if keywords:
+        queries.append(" ".join(keywords))
+
+    if analysis["question_type"] == "definition":
+        queries.append(f"{original} definition explanation")
+
+    elif analysis["question_type"] == "comparison":
+        queries.append(f"{original} comparison differences")
+
+    elif analysis["question_type"] == "reasoning":
+        queries.append(f"{original} causes reasons")
+
+    elif analysis["question_type"] == "explanation":
+        queries.append(f"{original} detailed explanation")
+
+    return list(dict.fromkeys(queries))
+
+
+def rank_retrieved_results(
+    results: List[Dict[str, Any]],
+    query: str
+) -> List[Dict[str, Any]]:
+    """
+    Rank retrieved research results using simple
+    keyword-overlap scoring.
+    """
+
+    analysis = analyze_query(query)
+    keywords = set(analysis["keywords"])
+
+    ranked = []
+
+    for result in results:
+        text = str(
+            result.get("text", result.get("content", ""))
+        ).lower()
+
+        matched = sum(
+            1 for keyword in keywords
+            if keyword in text
+        )
+
+        item = dict(result)
+        item["keyword_score"] = matched
+
+        ranked.append(item)
+
+    ranked.sort(
+        key=lambda item: item.get("keyword_score", 0),
+        reverse=True
+    )
+
+    return ranked
+
+
+def build_research_context(
+    results: List[Dict[str, Any]],
+    max_results: int = 5
+) -> str:
+    """
+    Build a clean context from retrieved research results.
+    """
+
+    selected = results[:max_results]
+
+    context_parts = []
+
+    for index, result in enumerate(selected, start=1):
+
+        text = result.get(
+            "text",
+            result.get("content", "")
+        )
+
+        if not text:
+            continue
+
+        context_parts.append(
+            f"[Source {index}]\n{text}"
+        )
+
+    return "\n\n".join(context_parts)
+
+
+def create_research_prompt(
+    query: str,
+    context: str
+) -> str:
+    """
+    Create a research-oriented prompt using
+    the retrieved context.
+    """
+
+    return f"""
+You are a research assistant.
+
+Answer the following research question using
+only the provided context.
+
+Research Question:
+{query}
+
+Retrieved Context:
+{context}
+
+Instructions:
+1. Give a clear and accurate answer.
+2. Use information from the retrieved context.
+3. Do not invent unsupported facts.
+4. Organize the answer logically.
+5. Mention important points clearly.
+"""
+
+
+def research_query_info(query: str) -> Dict[str, Any]:
+    """
+    Return complete research intelligence information
+    for a user query.
+    """
+
+    analysis = analyze_query(query)
+    expanded_queries = expand_query(query)
+
+    return {
+        "analysis": analysis,
+        "expanded_queries": expanded_queries
+    }
+
+
+if __name__ == "__main__":
+
+    test_query = "What is Retrieval Augmented Generation?"
+
+    result = research_query_info(test_query)
+
+    print("=" * 60)
+    print("PHASE 9 - RESEARCH INTELLIGENCE TEST")
+    print("=" * 60)
+
+    print("\nQuery:")
+    print(result["analysis"]["query"])
+
+    print("\nQuestion Type:")
+    print(result["analysis"]["question_type"])
+
+    print("\nKeywords:")
+    print(result["analysis"]["keywords"])
+
+    print("\nExpanded Queries:")
+    for query in result["expanded_queries"]:
+        print("-", query)
+
+    print("\n" + "=" * 60)
+    print("✅ PHASE 9 MODULE TEST COMPLETED")
+    print("=" * 60)
