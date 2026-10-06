@@ -1,6 +1,20 @@
-pymupdf
-sentence-transformers
-faiss-cpu
-gradio
+# Core
 numpy
 pandas
+scikit-learn
+
+# PDF Processing
+pypdf
+
+# Embeddings
+sentence-transformers
+
+# Vector Database
+faiss-cpu
+
+# RAG / NLP
+transformers
+torch
+
+# Utilities
+tqdm
