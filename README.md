@@ -1,128 +1,133 @@
-# ResearchMind AI
+# ResearchMind-AI
+## AI Personal Research Assistant using Retrieval-Augmented Generation
 
-## RAG-Based Personal Research Assistant
+ResearchMind-AI is an AI-powered research assistant designed to
+retrieve information from research papers and generate answers
+using Retrieval-Augmented Generation (RAG).
 
-ResearchMind AI is an AI-powered personal research assistant that uses
-Retrieval-Augmented Generation (RAG) to help users interact with
-research papers and technical documents.
+## Features
 
-The system is designed to retrieve relevant information from uploaded
-documents and provide context-aware answers with source references.
-
----
-
-## 🚧 Project Status
-
-Currently under active development.
-
-### Completed
-- Google Drive-based project structure
-- Python environment setup
-- Dependency management using requirements.txt
-- Central project configuration
-- PDF processing pipeline - in progress
-
-### Upcoming Features
-- PDF text extraction
-- Text cleaning and chunking
-- Semantic embeddings
+- Research paper PDF text extraction
+- Text cleaning and document chunking
+- Semantic embeddings generation
 - FAISS vector database
-- Semantic document retrieval
-- RAG-based question answering
-- Source and page-level citations
-- Conversational memory
-- Research paper summarization
-- Multi-paper comparison
-- Research gap identification
+- Relevant research information retrieval
+- Context-based answer generation
+- Source-level citations support
+- Research evaluation
 - Gradio web interface
-- Evaluation and deployment
 
----
-
-## 🏗️ Planned Architecture
-
-User
-  ↓
-Document Upload
-  ↓
-PDF Processing
-  ↓
-Text Chunking
-  ↓
-Embedding Generation
-  ↓
-FAISS Vector Database
-  ↓
-Semantic Retrieval
-  ↓
-Relevant Context
-  ↓
-Large Language Model
-  ↓
-Answer + Sources
-
----
-
-## 🛠️ Technologies
+## Technologies Used
 
 - Python
-- PyMuPDF
+- Google Colab
 - Sentence Transformers
 - FAISS
-- NumPy
-- Pandas
+- Hugging Face Transformers
+- FLAN-T5
 - Gradio
-- Large Language Models
-- Retrieval-Augmented Generation (RAG)
+- NumPy
 
----
+## Project Architecture
 
-## 📁 Project Structure
+PDF Research Papers
+        |
+        v
+Text Extraction
+        |
+        v
+Text Cleaning and Chunking
+        |
+        v
+Embedding Generation
+        |
+        v
+FAISS Vector Database
+        |
+        v
+Semantic Retrieval
+        |
+        v
+Context-based Answer Generation
+        |
+        v
+Gradio Interface
+
+## Project Structure
 
 ResearchMind-AI/
-│
-├── data/
-│   ├── papers/
-│   └── processed/
-│
-├── vector_store/
-│
-├── src/
-│   └── config.py
-│
-├── app/
-│
-├── notebooks/
-│
-├── requirements.txt
-├── README.md
-└── .gitignore
+|
+|-- data/
+|   |-- papers/
+|   |-- processed/
+|   |-- vector_db/
+|
+|-- src/
+|   |-- config.py
+|   |-- retrieval.py
+|   |-- rag_pipeline.py
+|   |-- citations.py
+|   |-- research_evaluation.py
+|   |-- research_intelligence.py
+|   |-- phase5_retrieval.py
+|
+|-- app/
+|   |-- app.py
+|
+|-- notebooks/
+|
+|-- requirements.txt
+|-- README.md
+|-- .gitignore
 
----
+## Installation
 
-## 🎯 Project Goals
+Clone the repository:
 
-The goal of ResearchMind AI is to provide an intelligent research
-workspace that can:
+    git clone https://github.com/mullapudilakshmisai5-arch/ResearchMind-AI.git
 
-1. Search information across multiple documents
-2. Answer research-related questions
-3. Provide source-level references
-4. Summarize research papers
-5. Compare multiple papers
-6. Identify potential research gaps
+Navigate to the project directory:
 
----
+    cd ResearchMind-AI
 
-## 👨‍💻 Author
+Install dependencies:
+
+    pip install -r requirements.txt
+
+## Running the Application
+
+Run the Gradio application from the project root:
+
+    python app/app.py
+
+The application requires the processed research chunks and
+FAISS index to be available in the expected data directories.
+
+## Project Goals
+
+1. Search information across research documents.
+2. Answer research-related questions.
+3. Provide source-level references.
+4. Summarize research papers.
+5. Compare multiple research papers.
+6. Identify potential research gaps.
+
+## Current Limitations
+
+- Answer quality depends on the language model.
+- Generated answers require evaluation for accuracy.
+- Research documents and vector indexes must be available.
+- Some answer-generation tests use a rule-based fallback
+  when the language model output is insufficient.
+
+## Author
 
 Lakshmi Sai
 
 AI & Machine Learning Student
 
----
+## Project Status
 
-## 📌 Note
-
-This project is being developed incrementally as part of an
-AI/ML portfolio project.
+ResearchMind-AI is developed as an AI/ML portfolio project.
+The implementation includes document processing, semantic
+retrieval, answer generation, evaluation, and a Gradio interface.

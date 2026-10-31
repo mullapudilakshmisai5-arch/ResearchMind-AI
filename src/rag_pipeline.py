@@ -27,9 +27,12 @@ def generate_rag_answer(
         top_k=top_k
     )
 
-    context = "\n\n".join(
-        str(chunk) for chunk in context_chunks
-    )
+    if isinstance(context_chunks, dict):
+        context = context_chunks.get("context", "")
+    else:
+        context = "\n\n".join(
+            str(chunk) for chunk in context_chunks
+        )
 
     prompt = f"""
 Use the following research paper context to answer the question.
